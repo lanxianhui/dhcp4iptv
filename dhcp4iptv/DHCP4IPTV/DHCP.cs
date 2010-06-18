@@ -505,7 +505,10 @@ namespace DHCP4IPTV
                 string strSubnetMask = IPToString(m_dwSubnetMask);
                 m_IStatusUpdate.UpdateStatus("Received DHCP ACK with IP " + strIP);
                 NetworkManagement networkMgmt = new NetworkManagement();
-                networkMgmt.setIP(m_strNIC, strIP, strSubnetMask);
+                if ( networkMgmt.setIP(m_strNIC, strIP, strSubnetMask) )
+                    m_IStatusUpdate.UpdateStatus("Set network card IP to " + strIP);
+                else
+                    m_IStatusUpdate.UpdateStatus("Failed to change network card IP");
                 m_State = DHCPState.BOUND;
             }
         }

@@ -16,10 +16,11 @@ namespace DHCP4IPTV
         /// <param name="ip_address">The IP Address</param> 
         /// <param name="subnet_mask">The Submask IP Address</param> 
         /// <remarks>Requires a reference to the System.Management namespace</remarks> 
-        public void setIP(string strNIC, string ip_address, string subnet_mask)
+        public bool setIP(string strNIC, string ip_address, string subnet_mask)
         {
             ManagementClass objMC = new ManagementClass("Win32_NetworkAdapterConfiguration");
             ManagementObjectCollection objMOC = objMC.GetInstances();
+            bool bRet = false;
 
             foreach (ManagementObject objMO in objMOC)
             {
@@ -35,6 +36,7 @@ namespace DHCP4IPTV
                         newIP["SubnetMask"] = new string[] { subnet_mask };
 
                         setIP = objMO.InvokeMethod("EnableStatic", newIP, null);
+                        bRet = true;
                     }
                     catch (Exception)
                     {
@@ -42,6 +44,7 @@ namespace DHCP4IPTV
                     }
                 }
             }
+            return bRet;
         }
 
         /// <summary> 
