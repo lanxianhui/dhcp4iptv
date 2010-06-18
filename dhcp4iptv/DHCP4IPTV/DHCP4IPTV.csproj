@@ -60,11 +60,12 @@
   <ItemGroup>
     <Reference Include="PacketDotNet, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharpPcap\SharpPcap\bin\Release\PacketDotNet.dll</HintPath>
+      <HintPath>Refs\PacketDotNet.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="SharpPcap, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharpPcap\SharpPcap\bin\Release\SharpPcap.dll</HintPath>
+      <HintPath>Refs\SharpPcap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
