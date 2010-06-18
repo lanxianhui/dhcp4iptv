@@ -111,6 +111,8 @@ namespace DHCP4IPTV
 
         private void StartFilter()
         {
+            m_Device = null;
+
             while (!m_bStop)
             {
                 try
@@ -123,38 +125,51 @@ namespace DHCP4IPTV
                     foreach (LivePcapDevice dev in devices)
                     {
                         if (dev.Description.ToString() == m_strNIC)
+                        {
                             m_Device = devices[i];
-                        break;
+                            break;
+                        }
+                        else
+                        {
+                            i++;
+                        }
                     }
-                
-                    //Open the device for capturing
-                    int readTimeoutMilliseconds = 1000;
-                    m_Device.Open(DeviceMode.Promiscuous, readTimeoutMilliseconds);
 
-                    //Register our handler function to the 'packet arrival' event
-                    m_Device.OnPacketArrival += new PacketArrivalEventHandler(device_OnPacketArrival);
-
-                    // udpdump filter to capture only UDP/IP packets
-                    string filter = "udp";
-                    m_Device.SetFilter(filter);
-
-                    if (m_dtBound != DateTime.MaxValue)
+                    if (m_Device == null)
                     {
-                        m_IStatusUpdate.UpdateStatus("Next update at " + (m_dtBound + m_spanLease).ToString());
+                        m_IStatusUpdate.UpdateStatus("Failed to get handle to NIC");
                     }
                     else
                     {
-                        m_IStatusUpdate.UpdateStatus("Started DHCP Client...");
-                    }
-                    // Start capture packets
-                    m_Device.Capture();
-                    // NO stop request...
-                    if (!m_bStop)
-                    {
-                        if (m_Device != null)
+                        //Open the device for capturing
+                        int readTimeoutMilliseconds = 1000;
+                        m_Device.Open(DeviceMode.Promiscuous, readTimeoutMilliseconds);
+
+                        //Register our handler function to the 'packet arrival' event
+                        m_Device.OnPacketArrival += new PacketArrivalEventHandler(device_OnPacketArrival);
+
+                        // udpdump filter to capture only UDP/IP packets
+                        string filter = "udp";
+                        m_Device.SetFilter(filter);
+
+                        if (m_dtBound != DateTime.MaxValue)
                         {
-                            m_Device.Close();
-                            m_Device = null;
+                            m_IStatusUpdate.UpdateStatus("Next update at " + (m_dtBound + m_spanLease).ToString());
+                        }
+                        else
+                        {
+                            m_IStatusUpdate.UpdateStatus("Started DHCP Client...");
+                        }
+                        // Start capture packets
+                        m_Device.Capture();
+                        // NO stop request...
+                        if (!m_bStop)
+                        {
+                            if (m_Device != null)
+                            {
+                                m_Device.Close();
+                                m_Device = null;
+                            }
                         }
                     }
                 }

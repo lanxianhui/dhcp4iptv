@@ -163,11 +163,18 @@ namespace DHCP4IPTV
         {
             LivePcapDeviceList devices = null;
 
-            devices = LivePcapDeviceList.Instance;
-            
-            /* Scan the list printing every entry */
-            foreach (LivePcapDevice dev in devices)
-                cmbNIC.Items.Add(dev.Description.ToString());
+            try
+            {
+                devices = LivePcapDeviceList.Instance;
+
+                /* Scan the list printing every entry */
+                foreach (LivePcapDevice dev in devices)
+                    cmbNIC.Items.Add(dev.Description.ToString());
+            }
+            catch (Exception)
+            {
+                UpdateStatus("Error loading network card list");
+            }
         }
 
 
