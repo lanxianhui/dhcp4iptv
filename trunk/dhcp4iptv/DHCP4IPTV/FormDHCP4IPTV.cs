@@ -70,12 +70,13 @@ namespace DHCP4IPTV
 
             RegistryKey key = Registry.CurrentUser.CreateSubKey(m_strKeyName);
 
-            #region NICName
+        #region NICName
+
             string strNIC = (string)key.GetValue("NICName");
             cmbNIC.SelectedIndex = 0;
-            if (strNIC != null)
+            if (strNIC != null && (cmbNIC.Items.Count > 0) )
             {
-                for (int i = 0; i<cmbNIC.Items.Count; i++)
+                for (int i = 0; i < cmbNIC.Items.Count; i++)
                 {
                     if ((string)cmbNIC.Items[i] == strNIC)
                     {
@@ -83,7 +84,8 @@ namespace DHCP4IPTV
                     }
                 }
             }
-            #endregion
+
+        #endregion
 
             #region DecoderName
             string strDecoder = (string)key.GetValue("DecoderName");
