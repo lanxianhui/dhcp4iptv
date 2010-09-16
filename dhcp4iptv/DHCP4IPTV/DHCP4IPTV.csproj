@@ -59,10 +59,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PacketDotNet">
-      <HintPath>..\..\PacketDotNet\PacketDotNet\bin\Release\PacketDotNet.dll</HintPath>
+      <HintPath>references\PacketDotNet.dll</HintPath>
     </Reference>
     <Reference Include="SharpPcap">
-      <HintPath>..\..\SharpPcap\SharpPcap\bin\Debug\SharpPcap.dll</HintPath>
+      <HintPath>references\SharpPcap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
