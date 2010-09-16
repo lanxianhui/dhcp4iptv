@@ -76,6 +76,7 @@ namespace DHCP4IPTV
         private byte[] m_byDecoder;
 
         private string m_strNIC;
+        private string m_strMAC;
 
         DateTime m_dtBound = DateTime.MaxValue;
         TimeSpan m_spanLease = new TimeSpan(0);
@@ -225,7 +226,7 @@ namespace DHCP4IPTV
         private static void device_OnPacketArrival(object sender, CaptureEventArgs e)
         {
             var time = e.Packet.Timeval.Date;
-            if ( e.Packet.Data.Length > 400 )
+            if ( e.Packet.Data.Length > 350 )
                 m_Instance.HandleResponse(e.Packet.Data);
         }
 
@@ -464,29 +465,36 @@ namespace DHCP4IPTV
 
                 m_dwRequestedIP = BitConverter.ToUInt32(buffer, 0x10+42);
 
-                while (idx < buffer.Length && buffer[idx]!=0)
+                try
                 {
-                    byOption = buffer[idx++];
-                    byLength = buffer[idx++];
-
-                    switch (byOption)
+                    while (idx < buffer.Length - 2 )
                     {
-                        case 1: // subnet mask
-                            m_dwSubnetMask = BitConverter.ToUInt32(buffer, idx);
-                            idx += 4;
-                            break;
-                        case 51: // lease time
-                            m_dwLeaseTime = BitConverter.ToUInt32(buffer, idx);
-                            idx += 4;
-                            break;
-                        case 54: // server ID
-                            m_dwServerID = BitConverter.ToUInt32(buffer, idx);
-                            idx += 4;
-                            break;
-                        default:
-                            idx += (int)byLength;
-                            break;
+                        byOption = buffer[idx++];
+                        byLength = buffer[idx++];
+
+                        switch (byOption)
+                        {
+                            case 1: // subnet mask
+                                m_dwSubnetMask = BitConverter.ToUInt32(buffer, idx);
+                                idx += 4;
+                                break;
+                            case 51: // lease time
+                                m_dwLeaseTime = BitConverter.ToUInt32(buffer, idx);
+                                idx += 4;
+                                break;
+                            case 54: // server ID
+                                m_dwServerID = BitConverter.ToUInt32(buffer, idx);
+                                idx += 4;
+                                break;
+                            default:
+                                idx += (int)byLength;
+                                break;
+                        }
                     }
+                }
+                catch (Exception exc)
+                {
+                    string aap = exc.Message;
                 }
             }
         }
@@ -505,7 +513,8 @@ namespace DHCP4IPTV
                 string strSubnetMask = IPToString(m_dwSubnetMask);
                 m_IStatusUpdate.UpdateStatus("Received DHCP ACK with IP " + strIP);
                 NetworkManagement networkMgmt = new NetworkManagement();
-                if ( networkMgmt.setIP(m_strNIC, strIP, strSubnetMask) )
+
+                if ( networkMgmt.setIP(MAC, strIP, strSubnetMask) )
                     m_IStatusUpdate.UpdateStatus("Set network card IP to " + strIP);
                 else
                     m_IStatusUpdate.UpdateStatus("Failed to change network card IP");
@@ -738,6 +747,11 @@ namespace DHCP4IPTV
                 int discarded;
                 string strMAC = value + "00000000000000000000";
                 m_byMAC = HexEncoding.GetBytes(strMAC, out discarded);
+                m_strMAC = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", value.Substring(0,2), value.Substring(2,2), value.Substring(4,2), value.Substring(6,2), value.Substring(8,2), value.Substring(10,2)); 
+            }
+            get
+            {
+                return m_strMAC;
             }
         }
 

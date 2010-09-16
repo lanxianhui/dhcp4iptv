@@ -16,7 +16,7 @@ namespace DHCP4IPTV
         /// <param name="ip_address">The IP Address</param> 
         /// <param name="subnet_mask">The Submask IP Address</param> 
         /// <remarks>Requires a reference to the System.Management namespace</remarks> 
-        public bool setIP(string strNIC, string ip_address, string subnet_mask)
+        public bool setIP(string strMAC, string ip_address, string subnet_mask)
         {
             ManagementClass objMC = new ManagementClass("Win32_NetworkAdapterConfiguration");
             ManagementObjectCollection objMOC = objMC.GetInstances();
@@ -24,23 +24,27 @@ namespace DHCP4IPTV
 
             foreach (ManagementObject objMO in objMOC)
             {
-                if (((string)objMO["Description"]) == strNIC && ((bool)objMO["IPEnabled"]))
+                if (objMO["MacAddress"] != null && ((bool)objMO["IPEnabled"]))
                 {
-                    try
+                    string tempMAC = ((string)objMO["MacAddress"]).ToLower();
+                    if (strMAC.ToLower() == tempMAC)
                     {
-                        ManagementBaseObject setIP;
-                        ManagementBaseObject newIP =
-                            objMO.GetMethodParameters("EnableStatic");
+                        try
+                        {
+                            ManagementBaseObject setIP;
+                            ManagementBaseObject newIP =
+                                objMO.GetMethodParameters("EnableStatic");
 
-                        newIP["IPAddress"] = new string[] { ip_address };
-                        newIP["SubnetMask"] = new string[] { subnet_mask };
+                            newIP["IPAddress"] = new string[] { ip_address };
+                            newIP["SubnetMask"] = new string[] { subnet_mask };
 
-                        setIP = objMO.InvokeMethod("EnableStatic", newIP, null);
-                        bRet = true;
-                    }
-                    catch (Exception)
-                    {
-                        throw;
+                            setIP = objMO.InvokeMethod("EnableStatic", newIP, null);
+                            bRet = true;
+                        }
+                        catch (Exception)
+                        {
+                            throw;
+                        }
                     }
                 }
             }
